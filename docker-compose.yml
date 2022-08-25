@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  # prod:
+  #   build: ./code
+  #   volumes:
+  #     - ./code:/app
+  #     - ./code/configs/prod:/app/configs
+  dev:
+    build: ./code
+    volumes:
+      - ./code:/app
+      - ./code/configs/dev:/app/configs
