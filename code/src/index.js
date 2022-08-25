@@ -1,9 +1,9 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
-const { token, guildId, reactionChannel } = require("../configs/config.json");
+const { token, reactionChannel, botInfoChannel } = require("../configs/config.json");
 
-const { getActualRoleName } = require("./utils/reaction-roles/filters");
+const { getActualRoleName, startUpReactionRoles } = require("./utils/reaction-roles");
 
 const client = new Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
@@ -30,13 +30,7 @@ for (const file of commandFiles) {
 }
 
 client.once("ready", () => {
-  let guild = client.guilds.cache.get(guildId);
-  let channel = guild.channels.cache.get(reactionChannel);
-  channel.messages.fetch({ limit: 100 }).then((messages) => {
-    console.log(
-      messages.size + " messages found in " + channel.name + " channel."
-    );
-  });
+  startUpReactionRoles(client);
 
   console.log("Ready!");
 });
