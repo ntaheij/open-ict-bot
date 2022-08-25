@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
-const { token, guildId, reactionChannel } = require("../config.json");
+const { token, guildId, reactionChannel } = require("../configs/config.json");
 
 const { getActualRoleName } = require("./utils/reaction-roles");
 
@@ -82,7 +82,6 @@ client.on("messageReactionRemove", async (reaction, user) => {
   if (reaction.message.channel.id == reactionChannel) {
     let role = reaction.message.guild.roles.cache.find((r) => getActualRoleName(r.name) === reaction.emoji.name.toLowerCase());
     if(!role) return;
-    if(!reaction.message.guild.members.cache.get(user.id).roles.cache.has(role.id)) return;
 
     await reaction.message.guild.members.cache.get(user.id).roles.remove(role);
   }
