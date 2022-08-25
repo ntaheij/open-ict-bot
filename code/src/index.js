@@ -3,7 +3,7 @@ const path = require("node:path");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const { token, guildId, reactionChannel } = require("../configs/config.json");
 
-const { getActualRoleName } = require("./utils/reaction-roles");
+const { getActualRoleName } = require("./utils/reaction-roles/filters");
 
 const client = new Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
