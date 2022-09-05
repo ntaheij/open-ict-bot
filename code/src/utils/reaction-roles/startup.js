@@ -1,7 +1,7 @@
 const { guildId, reactionChannel } = require("../../../configs/config.json");
 const { emojis } = require("../../../configs/place-emojis.json");
 
-function startUpReactionRoles(client) {
+function startUpReactionRoles() {
   console.log("Start-up reaction roles");
   let guild = client.guilds.cache.get(guildId);
   let channel = guild.channels.cache.get(reactionChannel);

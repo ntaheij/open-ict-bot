@@ -82,3 +82,5 @@ client.on("messageReactionRemove", async (reaction, user) => {
 });
 
 client.login(token);
+
+global.client = client;
