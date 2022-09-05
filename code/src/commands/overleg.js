@@ -29,7 +29,7 @@ async function deleteChannels(interaction, guild, overlegInfo) {
 async function createChannels(interaction, guild) {
   let name = interaction.member.nickname || interaction.user.username;
   let channelInfo = {
-    name: `Overleg ${aaname}`,
+    name: `Overleg ${name}`,
     parent: voiceCategory,
     position: 100,
     permissionOverwrites: [
