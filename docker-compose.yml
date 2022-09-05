@@ -1,6 +1,9 @@
 version: "3.9"
 services:
   prod:
+    stdin_open: true
+    tty: true
+    privileged: true
     build: ./code
     volumes:
       - ./code:/app
