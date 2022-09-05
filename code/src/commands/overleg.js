@@ -8,17 +8,17 @@ const {
   ComponentType,
 } = require("discord.js");
 
-const { guildId, voiceCategory } = require("../../configs/config.json");
+const { guildId, voiceCategory, locationOverleg } = require("../../configs/config.json");
 
 const { readFile, writeFile } = require("../utils/jsonHelper");
 
 async function deleteChannels(interaction, guild, overlegInfo) {
-  readFile("./configs", "overlegruimtes").then((data) => {
+  readFile(locationOverleg, "overlegruimtes").then((data) => {
     let index = data.findIndex((x) => x.textId === overlegInfo.textId);
 
     if (index > -1) {
       data.splice(index, 1);
-      writeFile("./configs", "overlegruimtes", data);
+      writeFile(locationOverleg, "overlegruimtes", data);
     }
   });
 
@@ -114,9 +114,9 @@ Dit kanaal wordt automatisch verwijderd na 8 uur.
       });
   });
 
-  readFile("./configs", "overlegruimtes").then((data) => {
+  readFile(locationOverleg, "overlegruimtes").then((data) => {
     data.push({ ...overlegInfo });
-    writeFile("./configs", "overlegruimtes", data);
+    writeFile(locationOverleg, "overlegruimtes", data);
   });
 
   setTimeout(() => {
@@ -171,7 +171,7 @@ module.exports = {
           ephemeral: true,
         });
       case "stop":
-        readFile("./configs", "overlegruimtes").then((overlegruimtes) => {
+        readFile(locationOverleg, "overlegruimtes").then((overlegruimtes) => {
           overlegruimtes = overlegruimtes.filter(
             (overleg) => overleg.textId === interaction.channel.id
           );
@@ -188,7 +188,7 @@ module.exports = {
           }
         );
 
-        await readFile("./configs", "overlegruimtes").then((overlegruimtes) => {
+        await readFile(locationOverleg, "overlegruimtes").then((overlegruimtes) => {
           overlegruimte = overlegruimtes.filter(
             (overleg) => overleg.textId === interaction.channel.id
           );
@@ -213,7 +213,7 @@ module.exports = {
           interaction.options.getUser("gebruiker").id
         );
 
-        await readFile("./configs", "overlegruimtes").then((overlegruimtes) => {
+        await readFile(locationOverleg, "overlegruimtes").then((overlegruimtes) => {
           overlegruimte = overlegruimtes.filter(
             (overleg) => overleg.textId === interaction.channel.id
           );
