@@ -8,7 +8,11 @@ const {
   ComponentType,
 } = require("discord.js");
 
-const { guildId, voiceCategory, locationOverleg } = require("../../configs/config.json");
+const {
+  guildId,
+  voiceCategory,
+  locationOverleg,
+} = require("../../configs/config.json");
 
 const { readFile, writeFile } = require("../utils/jsonHelper");
 
@@ -58,6 +62,7 @@ async function createChannels(interaction, guild) {
     voiceId: null,
     textId: null,
     creationDate: Date.now(),
+    creationUser: interaction.member.id,
   };
 
   const row = new ActionRowBuilder().addComponents(
@@ -176,6 +181,19 @@ module.exports = {
           overlegruimtes = overlegruimtes.filter(
             (overleg) => overleg.textId === interaction.channel.id
           );
+
+          if (interaction.user.id === overlegruimtes[0].creationUser) {
+            interaction.reply({
+              content: "Kanalen aan het verwijderen...",
+              ephemeral: true,
+            });
+          } else {
+            return interaction.reply({
+              content: `Jij mag deze knop niet gebruiken. Alleen <@${overlegruimtes[0].creationUser}> mag dat.`,
+              ephemeral: true,
+            });
+          }
+
           deleteChannels(interaction, guild, overlegruimtes[0]);
         });
         break;
@@ -189,21 +207,25 @@ module.exports = {
           }
         );
 
-        await readFile(locationOverleg, "overlegruimtes").then((overlegruimtes) => {
-          overlegruimte = overlegruimtes.filter(
-            (overleg) => overleg.textId === interaction.channel.id
-          );
+        await readFile(locationOverleg, "overlegruimtes").then(
+          (overlegruimtes) => {
+            overlegruimte = overlegruimtes.filter(
+              (overleg) => overleg.textId === interaction.channel.id
+            );
 
-          let voiceId = overlegruimte[0].voiceId;
-          guild.channels.cache.get(voiceId).permissionOverwrites.edit(
-            interaction.options.getUser("gebruiker").id,
-            {
-              ViewChannel: true,
-              Connect: true,
-              SendMessages: true,
-            }
-          );
-        });
+            let voiceId = overlegruimte[0].voiceId;
+            guild.channels.cache
+              .get(voiceId)
+              .permissionOverwrites.edit(
+                interaction.options.getUser("gebruiker").id,
+                {
+                  ViewChannel: true,
+                  Connect: true,
+                  SendMessages: true,
+                }
+              );
+          }
+        );
 
         return interaction.reply({
           content: `Gebruiker toegevoegd.`,
@@ -214,16 +236,20 @@ module.exports = {
           interaction.options.getUser("gebruiker").id
         );
 
-        await readFile(locationOverleg, "overlegruimtes").then((overlegruimtes) => {
-          overlegruimte = overlegruimtes.filter(
-            (overleg) => overleg.textId === interaction.channel.id
-          );
+        await readFile(locationOverleg, "overlegruimtes").then(
+          (overlegruimtes) => {
+            overlegruimte = overlegruimtes.filter(
+              (overleg) => overleg.textId === interaction.channel.id
+            );
 
-          let voiceId = overlegruimte[0].voiceId;
-					guild.channels.cache.get(voiceId).permissionOverwrites.delete(
-            interaction.options.getUser("gebruiker").id
-          );
-        });
+            let voiceId = overlegruimtes[0].voiceId;
+            guild.channels.cache
+              .get(voiceId)
+              .permissionOverwrites.delete(
+                interaction.options.getUser("gebruiker").id
+              );
+          }
+        );
 
         return interaction.reply({
           content: `Gebruiker verwijderd.`,
