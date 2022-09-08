@@ -46,19 +46,28 @@ module.exports = {
     switch (subCommand) {
       case "start":
         createChannels(interaction, guild);
-
-        return interaction.reply({
-          content: `Kanalen zijn aangemaakt.`,
-          ephemeral: true,
-        });
+        break;
       case "stop":
         readFile(locationOverleg, "overlegruimtes").then((overlegruimtes) => {
+          if(overlegruimtes.length <= 0 ) {
+            return interaction.reply({
+              content: `Dit is geen overlegkanaal.`,
+              ephemeral: true,
+            });
+          }
           overlegruimtes = overlegruimtes.filter(
             (overleg) => overleg.textId === interaction.channel.id
           );
 
+          if(overlegruimtes.length <= 0 ) {
+            return interaction.reply({
+              content: `Dit is geen overlegkanaal.`,
+              ephemeral: true,
+            });
+          }
+
           if (interaction.user.id === overlegruimtes[0].creationUser) {
-            interaction.reply({
+            return interaction.reply({
               content: "Kanalen aan het verwijderen...",
               ephemeral: true,
             });
@@ -103,8 +112,7 @@ module.exports = {
         );
 
         return interaction.reply({
-          content: `Gebruiker toegevoegd.`,
-          ephemeral: true,
+          content: `<@${interaction.options.getUser("gebruiker").id}> toegevoegd.`,
         });
       case "verwijderen":
         await interaction.channel.permissionOverwrites.delete(
@@ -127,8 +135,7 @@ module.exports = {
         );
 
         return interaction.reply({
-          content: `Gebruiker verwijderd.`,
-          ephemeral: true,
+          content: `<@${interaction.options.getUser("gebruiker").id}> verwijderd.`,
         });
       default:
         break;

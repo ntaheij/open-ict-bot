@@ -9,7 +9,11 @@ const {
 
 const { readFile, writeFile } = require("../jsonHelper");
 
-const { guildId, locationOverleg, voiceCategory } = require("../../../configs/config.json");
+const {
+  guildId,
+  locationOverleg,
+  voiceCategory,
+} = require("../../../configs/config.json");
 
 function removeAllPendingChannels() {
   let guild = client.guilds.cache.get(guildId);
@@ -48,6 +52,19 @@ async function deleteChannels(interaction, guild, overlegInfo) {
 }
 
 async function createChannels(interaction, guild) {
+  overlegruimtes = await readFile(locationOverleg, "overlegruimtes");
+  if (overlegruimtes.length > 0) {
+    overlegruimtes = overlegruimtes.filter(
+      (overleg) => overleg.creationUser === interaction.user.id
+    );
+    if (overlegruimtes.length > 0) {
+      return interaction.reply({
+        content: `Je hebt al een overlegkanaal aangemaakt.`,
+        ephemeral: true,
+      });
+    }
+  }
+
   let name = interaction.member.nickname || interaction.user.username;
   let channelInfo = {
     name: `Overleg ${name}`,
@@ -135,6 +152,11 @@ Dit kanaal wordt automatisch verwijderd na 8 uur.
           }
         });
       });
+
+    return interaction.reply({
+      content: `Kanalen zijn aangemaakt.`,
+      ephemeral: true,
+    });
   });
 
   readFile(locationOverleg, "overlegruimtes").then((data) => {
