@@ -4,6 +4,7 @@ const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const { token, reactionChannel, botInfoChannel } = require("../configs/config.json");
 
 const { getActualRoleName, startUpReactionRoles } = require("./utils/reaction-roles");
+const { removeAllPendingChannels } = require("./utils/overleg");
 
 const client = new Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
@@ -82,5 +83,7 @@ client.on("messageReactionRemove", async (reaction, user) => {
 });
 
 client.login(token);
+
+setInterval(removeAllPendingChannels, 60*1000);
 
 global.client = client;
