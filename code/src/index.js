@@ -1,10 +1,11 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const { Client, Collection, GatewayIntentBits } = require("discord.js");
-const { token, reactionChannel, botInfoChannel } = require("../configs/config.json");
+const { Client, Collection, GatewayIntentBits, ButtonStyle, ButtonBuilder, ActionRowBuilder, InteractionType } = require("discord.js");
+const { token, reactionChannel, botInfoChannel, guildId } = require("../configs/config.json");
 
 const { getActualRoleName, startUpReactionRoles } = require("./utils/reaction-roles");
-const { removeAllPendingChannels } = require("./utils/overleg");
+const { removeAllPendingChannels, createChannels } = require("./utils/overleg");
+const { readFile, writeFile } = require("./utils/jsonHelper");
 
 const client = new Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
@@ -31,14 +32,54 @@ for (const file of commandFiles) {
 }
 
 client.once("ready", () => {
+  const guild = client.guilds.cache.get(guildId);
   startUpReactionRoles(client);
+  
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+    .setCustomId("overleg_create")
+    .setLabel("Maak overlegkanaal")
+    .setStyle(ButtonStyle.Primary)
+    );
+    
+    readFile("configs", "config").then(async (data) => {
+      const channel = guild.channels.cache.get(data.overleg.channelId);
+      channel.messages.fetch(data.overleg.messageId).then((msg) => {
+        msg.delete();
+      });
+
+      let sent = await channel.send({ content: `
+Welkom bij de overlegkanalen! Hier kan je een overlegkanaal aanmaken. Dit kanaal is 8 uur geldig, daarna wordt het automatisch weer verwijderd.
+Overlegkanalen kan je gebruiken om met je peers te overleggen over een opdracht of om te praten over een bepaald probleem.
+
+**Commando's:**
+/overleg start - Maak overlegkanalen aan.
+/overleg stop - Verwijder de overleg kanalen.
+/overleg toevoegen (@tag) - Voeg een gebruiker toe aan de overleg kanalen.
+/overleg verwijderen (@tag) - Verwijder een gebruiker van de overleg kanalen.
+
+*TIP: Om een overleg te starten kan je eventueel ook op de knop hieronder drukken.*
+      `, components: [row] });
+      data.overleg.messageId = sent.id;
+
+      writeFile("configs", "config", data);
+  });
 
   console.log("Ready!");
 });
 
 client.on("interactionCreate", async (interaction) => {
+  if(interaction.type == InteractionType.MessageComponent) {
+    if(interaction.customId == 'overleg_create') {
+      createChannels(interaction, interaction.guild);
+      interaction.reply({
+        content: "Kanalen zijn aangemaakt.",
+        ephemeral: true,
+      });
+    }
+  }
+  
   if (!interaction.isChatInputCommand()) return;
-
   const command = client.commands.get(interaction.commandName);
 
   if (!command) return;
@@ -48,7 +89,7 @@ client.on("interactionCreate", async (interaction) => {
   } catch (error) {
     console.error(error);
     await interaction.reply({
-      content: "There was an error while executing this command!",
+      content: "There was an error whilst executing this command!",
       ephemeral: true,
     });
   }
