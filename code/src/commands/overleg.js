@@ -67,7 +67,7 @@ module.exports = {
           }
 
           if (interaction.user.id === overlegruimtes[0].creationUser) {
-            return interaction.reply({
+            interaction.reply({
               content: "Kanalen aan het verwijderen...",
               ephemeral: true,
             });
