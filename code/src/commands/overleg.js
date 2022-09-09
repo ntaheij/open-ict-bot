@@ -78,9 +78,9 @@ module.exports = {
             });
           }
 
-          deleteChannels(interaction, guild, overlegruimtes[0]);
+          return deleteChannels(interaction, guild, overlegruimtes[0]);
         });
-        break;
+        return;
       case "toevoegen":
         await interaction.channel.permissionOverwrites.edit(
           interaction.options.getUser("gebruiker").id,
