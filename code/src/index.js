@@ -72,10 +72,6 @@ client.on("interactionCreate", async (interaction) => {
   if(interaction.type == InteractionType.MessageComponent) {
     if(interaction.customId == 'overleg_create') {
       createChannels(interaction, interaction.guild);
-      interaction.reply({
-        content: "Kanalen zijn aangemaakt.",
-        ephemeral: true,
-      });
     }
   }
   
