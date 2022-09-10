@@ -165,7 +165,7 @@ Dit kanaal wordt automatisch verwijderd na 8 uur.
   });
 
   setTimeout(() => {
-    deleteChannels(interaction, guild, overlegInfo);
+    removeAllPendingChannels();
   }, 1000 * 60 * 60 * 8);
 }
 
