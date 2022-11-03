@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { Client, Collection, GatewayIntentBits, ButtonStyle, ButtonBuilder, ActionRowBuilder, InteractionType } = require("discord.js");
-const { token, reactionChannel, botInfoChannel, guildId } = require("../configs/config.json");
+const { token, reactionChannel, schoolChannel, guildId } = require("../configs/config.json");
 
 const { getActualRoleName, startUpReactionRoles } = require("./utils/reaction-roles");
 const { removeAllPendingChannels, createChannels } = require("./utils/overleg");
@@ -14,6 +14,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.GuildMessageTyping,
+    GatewayIntentBits.MessageContent,
   ],
 });
 
@@ -34,7 +35,7 @@ for (const file of commandFiles) {
 client.once("ready", () => {
   const guild = client.guilds.cache.get(guildId);
   startUpReactionRoles(client);
-  
+
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
     .setCustomId("overleg_create")
@@ -67,6 +68,24 @@ Overlegkanalen kan je gebruiken om met je peers te overleggen over een opdracht 
 
   console.log("Ready!");
 });
+
+client.on("messageCreate", async (message) => {
+  if(message.channel.id === schoolChannel) {
+    let role = message.guild.roles.cache.find((r) => r.name.toLowerCase() === message.content.toLowerCase());
+    let allrole = message.guild.roles.cache.find((r) => r.name === "Vraag de Student");
+    if(role) {
+      message.member.roles.add(role);
+      message.member.roles.add(allrole);
+      message.react("✅");
+    } else {
+      message.react("❌");
+    }
+
+    setInterval(() => {
+      message.delete();
+    }, 10*1000);
+  }
+}); 
 
 client.on("interactionCreate", async (interaction) => {
   if(interaction.type == InteractionType.MessageComponent) {
