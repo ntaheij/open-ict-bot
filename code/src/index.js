@@ -81,9 +81,7 @@ client.on("messageCreate", async (message) => {
       message.react("❌");
     }
 
-    setInterval(() => {
-      message.delete();
-    }, 10*1000);
+    message.delete({"timeout": 10000})
   }
 }); 
 
