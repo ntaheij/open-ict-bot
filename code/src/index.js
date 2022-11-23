@@ -1,5 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const express = require('express')
+const app = express()
 const { Client, Collection, GatewayIntentBits, ButtonStyle, ButtonBuilder, ActionRowBuilder, InteractionType } = require("discord.js");
 const { token, reactionChannel, schoolChannel, guildId } = require("../configs/config.json");
 
@@ -137,6 +139,14 @@ client.on("messageReactionRemove", async (reaction, user) => {
 });
 
 client.login(token);
+
+app.get('/', (req, res) => {
+  res.send('Bot is running!');
+})
+
+app.listen(80, () => {
+  console.log('Webserver is running!');
+})
 
 setInterval(removeAllPendingChannels, 60*1000);
 
