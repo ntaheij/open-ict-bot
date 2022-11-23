@@ -144,7 +144,7 @@ app.get('/', (req, res) => {
   res.send('Bot is running!');
 })
 
-app.listen(80, () => {
+app.listen(5000, () => {
   console.log('Webserver is running!');
 })
 
