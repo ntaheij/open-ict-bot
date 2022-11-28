@@ -83,7 +83,8 @@ client.on("messageCreate", async (message) => {
       message.react("❌");
     }
 
-    message.delete({timeout: "10000"})
+    message.delete({timeout: 10000 })
+    message.author.send("Je hebt de rol " + role.name + " (Vraag de Student) gekregen. Je hebt nu extra kanalen die je kan bekijken.");
   }
 }); 
 
