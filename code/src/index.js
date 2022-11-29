@@ -76,11 +76,14 @@ client.on("messageCreate", async (message) => {
     let role = message.guild.roles.cache.find((r) => r.name.toLowerCase() === message.content.toLowerCase());
     let allrole = message.guild.roles.cache.find((r) => r.name === "Vraag de Student");
     if(role) {
-      message.member.roles.add(role);
+      message.member.roles.add(role).catch(() => {
+        message.author.send("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.");
+      });
       message.member.roles.add(allrole);
       message.author.send("Je hebt de rol " + role.name + " (Vraag de Student) gekregen. Je hebt nu extra kanalen die je kan bekijken.");
       message.react("✅");
     } else {
+      message.author.send("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.");
       message.react("❌");
     }
 
