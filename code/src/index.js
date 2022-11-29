@@ -11,7 +11,6 @@ const {
 const {
   token,
   reactionChannel,
-  schoolChannel,
   guildId,
 } = require("../configs/config.json");
 
