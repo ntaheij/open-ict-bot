@@ -1,12 +1,33 @@
 const fs = require("node:fs");
 const path = require("node:path");
-const express = require('express')
-const app = express()
-const { Client, Collection, GatewayIntentBits, ButtonStyle, ButtonBuilder, ActionRowBuilder, InteractionType } = require("discord.js");
-const { token, reactionChannel, schoolChannel, guildId } = require("../configs/config.json");
+const express = require("express");
+const app = express();
+const {
+  Client,
+  Collection,
+  GatewayIntentBits,
+  InteractionType,
+} = require("discord.js");
+const {
+  token,
+  reactionChannel,
+  schoolChannel,
+  guildId,
+} = require("../configs/config.json");
 
-const { getActualRoleName, startUpReactionRoles } = require("./utils/reaction-roles");
-const { removeAllPendingChannels, createChannels } = require("./utils/overleg");
+const {
+  getActualRoleName,
+  startUpReactionRoles,
+} = require("./utils/reaction-roles");
+const {
+  removeAllPendingChannels,
+  createChannels,
+  updateOverlegMessage,
+} = require("./utils/overleg");
+const {
+  updateVraagMessage,
+  giveRolesVraagStudent,
+} = require("./utils/vraag-de-student");
 const { readFile, writeFile } = require("./utils/jsonHelper");
 
 const client = new Client({
@@ -34,78 +55,34 @@ for (const file of commandFiles) {
   client.commands.set(command.data.name, command);
 }
 
-client.once("ready", () => {
+client.once("ready", async () => {
   const guild = client.guilds.cache.get(guildId);
   startUpReactionRoles(client);
+  const id1 = await updateOverlegMessage(guild);
+  const id2 = await updateVraagMessage(guild);
 
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-    .setCustomId("overleg_create")
-    .setLabel("Maak overlegkanaal")
-    .setStyle(ButtonStyle.Primary)
-    );
-    
-    readFile("configs", "config").then(async (data) => {
-      const channel = guild.channels.cache.get(data.overleg.channelId);
-      channel.messages.fetch(data.overleg.messageId).then((msg) => {
-        msg.delete();
-      });
-
-      let sent = await channel.send({ content: `
-Welkom bij de overlegkanalen! Hier kan je een overlegkanaal aanmaken. Dit kanaal is 8 uur geldig, daarna wordt het automatisch weer verwijderd.
-Overlegkanalen kan je gebruiken om met je peers te overleggen over een opdracht of om te praten over een bepaald probleem.
-
-**Commando's:**
-/overleg start - Maak overlegkanalen aan.
-/overleg stop - Verwijder de overleg kanalen.
-/overleg toevoegen (@tag) - Voeg een gebruiker toe aan de overleg kanalen.
-/overleg verwijderen (@tag) - Verwijder een gebruiker van de overleg kanalen.
-
-*TIP: Om een overleg te starten kan je eventueel ook op de knop hieronder drukken.*
-      `, components: [row] });
-      data.overleg.messageId = sent.id;
-
-      writeFile("configs", "config", data);
+  readFile("configs", "config").then(async (data) => {
+    data.overleg.messageId = id1;
+    data.vraagStudent.messageId = id2;
+    writeFile("configs", "config", data);
   });
 
   console.log("Ready!");
 });
 
-client.on("messageCreate", async (message) => {
-  if(message.channel.id === schoolChannel) {
-    let role = message.guild.roles.cache.find((r) => r.name.toLowerCase() === message.content.toLowerCase());
-    let allrole = message.guild.roles.cache.find((r) => r.name === "Vraag de Student");
-    if(role) {
-      message.member.roles.add(role).catch(() => {
-        message.author.send("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.").catch(() => {
-          message.reply("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.").then((msg) => {
-            msg.delete({timeout: 10000 })
-          });
-        });
-      });
-      message.member.roles.add(allrole);
-      message.author.send("Je hebt de rol " + role.name + " (Vraag de Student) gekregen. Je hebt nu extra kanalen die je kan bekijken.");
-      message.react("✅");
-    } else {
-      message.author.send("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.").catch(() => {
-        message.reply("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.").then((msg) => {
-          msg.delete({timeout: 10000 })
-        });
-      });
-      message.react("❌");
-    }
-
-    message.delete({timeout: 10000 });
-  }
-}); 
-
 client.on("interactionCreate", async (interaction) => {
-  if(interaction.type == InteractionType.MessageComponent) {
-    if(interaction.customId == 'overleg_create') {
+  if (interaction.type == InteractionType.MessageComponent) {
+    if (interaction.customId == "overleg_create") {
       createChannels(interaction, interaction.guild);
     }
   }
-  
+
+  if (interaction.isSelectMenu()) {
+    if (interaction.customId == "select_school") {
+      giveRolesVraagStudent(interaction, interaction.guild);
+    }
+  }
+
   if (!interaction.isChatInputCommand()) return;
   const command = client.commands.get(interaction.commandName);
 
@@ -129,8 +106,10 @@ client.on("messageReactionAdd", async (reaction, user) => {
   if (!reaction.message.guild) return;
 
   if (reaction.message.channel.id == reactionChannel) {
-    let role = reaction.message.guild.roles.cache.find((r) => getActualRoleName(r.name) === reaction.emoji.name.toLowerCase());
-    if(!role) return;
+    let role = reaction.message.guild.roles.cache.find(
+      (r) => getActualRoleName(r.name) === reaction.emoji.name.toLowerCase()
+    );
+    if (!role) return;
 
     await reaction.message.guild.members.cache.get(user.id).roles.add(role);
   }
@@ -143,8 +122,10 @@ client.on("messageReactionRemove", async (reaction, user) => {
   if (!reaction.message.guild) return;
 
   if (reaction.message.channel.id == reactionChannel) {
-    let role = reaction.message.guild.roles.cache.find((r) => getActualRoleName(r.name) === reaction.emoji.name.toLowerCase());
-    if(!role) return;
+    let role = reaction.message.guild.roles.cache.find(
+      (r) => getActualRoleName(r.name) === reaction.emoji.name.toLowerCase()
+    );
+    if (!role) return;
 
     await reaction.message.guild.members.cache.get(user.id).roles.remove(role);
   }
@@ -152,14 +133,14 @@ client.on("messageReactionRemove", async (reaction, user) => {
 
 client.login(token);
 
-app.get('/', (req, res) => {
-  res.send('Bot is running!');
-})
+app.get("/", (req, res) => {
+  res.send("Bot is running!");
+});
 
 app.listen(5000, () => {
-  console.log('Webserver is running!');
-})
+  console.log("Webserver is running!");
+});
 
-setInterval(removeAllPendingChannels, 60*1000);
+setInterval(removeAllPendingChannels, 60 * 1000);
 
 global.client = client;
