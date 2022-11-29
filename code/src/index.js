@@ -78,13 +78,13 @@ client.on("messageCreate", async (message) => {
     if(role) {
       message.member.roles.add(role);
       message.member.roles.add(allrole);
+      message.author.send("Je hebt de rol " + role.name + " (Vraag de Student) gekregen. Je hebt nu extra kanalen die je kan bekijken.");
       message.react("✅");
     } else {
       message.react("❌");
     }
 
     message.delete({timeout: 10000 })
-    message.author.send("Je hebt de rol " + role.name + " (Vraag de Student) gekregen. Je hebt nu extra kanalen die je kan bekijken.");
   }
 }); 
 
