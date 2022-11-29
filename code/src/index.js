@@ -77,17 +77,25 @@ client.on("messageCreate", async (message) => {
     let allrole = message.guild.roles.cache.find((r) => r.name === "Vraag de Student");
     if(role) {
       message.member.roles.add(role).catch(() => {
-        message.author.send("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.");
+        message.author.send("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.").catch(() => {
+          message.reply("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.").then((msg) => {
+            msg.delete({timeout: 10000 })
+          });
+        });
       });
       message.member.roles.add(allrole);
       message.author.send("Je hebt de rol " + role.name + " (Vraag de Student) gekregen. Je hebt nu extra kanalen die je kan bekijken.");
       message.react("✅");
     } else {
-      message.author.send("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.");
+      message.author.send("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.").catch(() => {
+        message.reply("De rol \"" + message.content + "\" rol bestaat niet. Kies een correcte optie.").then((msg) => {
+          msg.delete({timeout: 10000 })
+        });
+      });
       message.react("❌");
     }
 
-    message.delete({timeout: 10000 })
+    message.delete({timeout: 10000 });
   }
 }); 
 
