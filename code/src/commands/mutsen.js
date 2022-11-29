@@ -6,6 +6,8 @@ module.exports = {
 		.setName('mutsen')
 		.setDescription('Bekijk de mogelijke kerstmutsen'),
 	async execute(interaction) {
+		if(new Date('2022-12-26').setHours(23,59,59) <= Date.now()) return interaction.reply({ content: 'Kerst is al voorbij, slimpie.', ephemeral: true });
+
     const canvas = Canvas.createCanvas(800, 600);
     const ctx = canvas.getContext("2d");
     const hats = await Canvas.loadImage("./assets/hats.png");
