@@ -16,12 +16,12 @@ module.exports = {
         .setName("muts-id")
         .setDescription("Het id van de muts")
         .setRequired(false)
+        .addChoices({ name: "0", value: 0 })
+        .addChoices({ name: "1", value: 1 })
+        .addChoices({ name: "2", value: 2 })
+        .addChoices({ name: "3", value: 3 })
+        .addChoices({ name: "4", value: 4 })
     )
-    .addChoices({ name: "0", value: 0 })
-    .addChoices({ name: "1", value: 1 })
-    .addChoices({ name: "2", value: 2 })
-    .addChoices({ name: "3", value: 3 })
-    .addChoices({ name: "4", value: 4 })
     .addIntegerOption((option) =>
       option
         .setName("offset-x")
