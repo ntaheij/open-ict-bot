@@ -12,7 +12,7 @@ async function giveRoles(interaction, guild) {
         content:
           'De rol "' +
           interaction.values[0] +
-          '" rol bestaat niet. Stuur een bericht naar de Moderators.',
+          '" bestaat niet. Stuur een bericht naar de Moderators.',
         ephemeral: true,
       });
     });
@@ -29,7 +29,7 @@ async function giveRoles(interaction, guild) {
       content:
         'De rol "' +
         interaction.values[0] +
-        '" rol bestaat niet. Stuur een bericht naar de Moderators.',
+        '" bestaat niet. Stuur een bericht naar de Moderators.',
       ephemeral: true,
     });
   }
