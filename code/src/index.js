@@ -31,6 +31,7 @@ const {
   giveRolesVraagStudent,
 } = require("./utils/vraag-de-student");
 const { readFile, writeFile } = require("./utils/jsonHelper");
+const { createEvent, deleteEvent, checkEvents } = require("./utils/evenementen");
 
 const client = new Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
@@ -139,191 +140,15 @@ client.on("messageReactionRemove", async (reaction, user) => {
 });
 
 client.on("guildScheduledEventCreate", async (guildScheduledEvent) => {
-  const guild = client.guilds.cache.get(guildId);
-  const channel = guild.channels.cache.get(eventsChannel);
-  const url = guildScheduledEvent.url;
-  const startTime = guildScheduledEvent.scheduledStartTimestamp;
-  const endTime = guildScheduledEvent.scheduledEndTimestamp;
-  let description = guildScheduledEvent.description;
-  let tags = null;
-
-  let day = new Date(startTime).toLocaleDateString("nl-NL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  let start = new Date(startTime).toLocaleTimeString("nl-NL", { hour: 'numeric', minute: 'numeric' });
-  let end = new Date(endTime).toLocaleTimeString("nl-NL", { hour: 'numeric', minute: 'numeric' });
-
-  let date = `${day} van ${start} tot ${end}`;
-
-  if (description != null && description.includes(";TAGS;")) {
-    let tmp = description.split(";TAGS; ");
-    description = tmp[0];
-    tags = tmp[1].split(" ");
-    tags = tags.map((tag) => tag.replace("#", ""));
-  }
-  sentMessage = await channel.send(`
-**${guildScheduledEvent.name}**
-${description || ""}
-
-**Datum:** ${date}
-**Locatie:** ${
-    guildScheduledEvent.channelId
-      ? `<#${guildScheduledEvent.channelId}>`
-      : guildScheduledEvent.entityMetadata.location
-  }
-**Relevante Tags:** ${getRolesByNames(tags) || "Geen tags gevonden"}
-
-${url}
-    `);
-
-  readFile("configs", "events").then(async (data) => {
-    data[url] = {
-      name: guildScheduledEvent.name,
-      messageId: sentMessage.id,
-      description: guildScheduledEvent.description,
-      start: guildScheduledEvent.scheduledStartTimestamp,
-      end: guildScheduledEvent.scheduledEndTimestamp,
-      location: guildScheduledEvent.channelId
-        ? `<#${guildScheduledEvent.channelId}>`
-        : guildScheduledEvent.entityMetadata.location,
-      url: url,
-      tags: tags,
-    };
-
-    writeFile("configs", "events", data);
-  });
+  createEvent(guildScheduledEvent);
 });
 
 client.on("guildScheduledEventUpdate", async (old, guildScheduledEvent) => {
-  readFile("configs", "events").then(async (data) => {
-    const guild = client.guilds.cache.get(guildId);
-    const channel = guild.channels.cache.get(eventsChannel);
-    const url = guildScheduledEvent.url;
-    const startTime = guildScheduledEvent.scheduledStartTimestamp;
-    const endTime = guildScheduledEvent.scheduledEndTimestamp;
-    let description = guildScheduledEvent.description;
-    let tags = null;
-
-    let day = new Date(startTime).toLocaleDateString("nl-NL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    let start = new Date(startTime).toLocaleTimeString("nl-NL", { hour: 'numeric', minute: 'numeric' });
-    let end = new Date(endTime).toLocaleTimeString("nl-NL", { hour: 'numeric', minute: 'numeric' });
-
-    let date = `${day} van ${start} tot ${end}`;
-
-    if (description != null && description.includes(";TAGS;")) {
-      let tmp = description.split(";TAGS; ");
-      description = tmp[0];
-      tags = tmp[1].split(" ");
-      tags = tags.map((tag) => tag.replace("#", ""));
-    }
-    const message = await channel.messages.fetch(data[url].messageId);
-    message.edit(`
-**${guildScheduledEvent.name}**
-${description || ""}
-
-**Datum:** ${date}
-**Locatie:** ${
-      guildScheduledEvent.channelId
-        ? `<#${guildScheduledEvent.channelId}>`
-        : guildScheduledEvent.entityMetadata.location
-    }
-**Relevante Tags:** ${getRolesByNames(tags) || "Geen tags gevonden"}
-  
-${url}
-      `);
-
-    data[url] = {
-      name: guildScheduledEvent.name,
-      messageId: message.id,
-      description: guildScheduledEvent.description,
-      start: startTime,
-      end: endTime,
-      location: guildScheduledEvent.channelId
-        ? `<#${guildScheduledEvent.channelId}>`
-        : guildScheduledEvent.entityMetadata.location,
-      url: url,
-      tags: tags,
-    };
-
-    writeFile("configs", "events", data);
-  });
+  updateEvent(guildScheduledEvent);
 });
 
-function getRolesByNames(tags) {
-  if (!tags) return;
-  const guild = client.guilds.cache.get(guildId);
-  let rolesToTag = [];
-  tags = tags.map((tag) => getActualRoleName(tag.replace("#", "")));
-
-  tags.forEach((tag) => {
-    let role = guild.roles.cache.find((r) => getActualRoleName(r.name) === tag);
-
-    if (!role) return;
-    rolesToTag.push(`<@&${role.id}>`);
-  });
-
-  return rolesToTag.join(" ");
-}
-
-function checkEvents() {
-  const guild = client.guilds.cache.get(guildId);
-  const channel = guild.channels.cache.get(announcementsChannel);
-  
-  readFile("configs", "events").then(async (data) => {
-    let events = Object.values(data);
-    let nextWeek = events.filter((event) => {
-      let week = new Date(event.start).getWeekNumber();
-      let nextWeekDate = new Date().getWeekNumber()+1;
-      return week === nextWeekDate;
-    });
-
-    if (nextWeek.length === 0) return;
-
-    let monday = new Date().setToNextWeekDay(1).toLocaleDateString("nl-NL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    let friday = new Date().setToNextWeekDay(5).toLocaleDateString("nl-NL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-    let message = `@everyone\n**Alle evenementen van week ${new Date().getWeekNumber()+1} (${monday} - ${friday}):**\n\n`;
-    channel.send(message);
-
-    nextWeek.forEach((event) => {
-      let day = new Date(event.start).toLocaleDateString("nl-NL", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      let start = new Date(event.start).toLocaleTimeString("nl-NL", { hour: 'numeric', minute: 'numeric' });
-      let end = new Date(event.end).toLocaleTimeString("nl-NL", { hour: 'numeric', minute: 'numeric' });
-
-      let date = `${day} van ${start} tot ${end}`;
-
-      message = `**${event.name}**\n${event.description.split(";TAGS;")[0] || ""}\n**Datum:** ${date}\n**Locatie:** ${
-        event.location
-      }\n\n${event.url}\n\n\n`;
-      channel.send(message);
-    });
-  });
-}
-
-Date.prototype.setToNextWeekDay = function(x){
-    var day = this.getDay() || 7;
-    if( day !== x ) 
-      this.setHours(168 + (-24 * (x - 1))); 
-    return this;
-}
-
-Date.prototype.getWeekNumber = function(){
-  var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
-  var dayNum = d.getUTCDay() || 7;
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-  var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-  return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
-};
-
-client.on("guildScheduledEventDelete", async (guildScheduledEventDelete) => {
-  const url = guildScheduledEventDelete.url;
-  const guild = client.guilds.cache.get(guildId);
-  const channel = guild.channels.cache.get(eventsChannel);
-
-  readFile("configs", "events").then(async (data) => {
-    const message = await channel.messages.fetch(data[url].messageId);
-    message.delete();
-    delete data[url];
-    writeFile("configs", "events", data);
-  });
+client.on("guildScheduledEventDelete", async (guildScheduledEvent) => {
+  deleteEvent(guildScheduledEvent);
 });
 
 client.login(token);
