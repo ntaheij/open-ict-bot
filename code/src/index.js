@@ -71,7 +71,7 @@ client.once("ready", async () => {
     writeFile("configs", "config", data);
   });
 
-  cron.schedule(`0 12 * * FRI`, async function() { 
+  cron.schedule(`0 12 * * TUE`, async function() { 
     checkEvents();
   }); 
 
