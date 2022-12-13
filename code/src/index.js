@@ -31,7 +31,7 @@ const {
   giveRolesVraagStudent,
 } = require("./utils/vraag-de-student");
 const { readFile, writeFile } = require("./utils/jsonHelper");
-const { createEvent, deleteEvent, checkEvents } = require("./utils/evenementen");
+const { createEvent, deleteEvent, updateEvent, checkEvents } = require("./utils/evenementen");
 
 const client = new Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
@@ -71,9 +71,9 @@ client.once("ready", async () => {
     writeFile("configs", "config", data);
   });
 
-  cron.schedule(`0 12 * * FRI`, async function() { 
+  // cron.schedule(`0 12 * * FRI`, async function() { 
     checkEvents();
-  }); 
+  // }); 
 
   console.log("Ready!");
 });

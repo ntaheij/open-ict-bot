@@ -1,6 +1,6 @@
 const { readFile, writeFile } = require("../../utils/jsonHelper");
 const { getRolesByNames, Date } = require("./eventHelpers");
-const { guildId, eventsChannel } = require("../../../configs/config.json");
+const { guildId, eventsChannel, announcementsChannel } = require("../../../configs/config.json");
 
 async function createEvent(guildScheduledEvent) {
   const guild = client.guilds.cache.get(guildId);
@@ -53,6 +53,7 @@ ${url}
     data[url] = {
       name: guildScheduledEvent.name,
       messageId: sentMessage.id,
+      announcementMessageId: null,
       description: guildScheduledEvent.description,
       start: guildScheduledEvent.scheduledStartTimestamp,
       end: guildScheduledEvent.scheduledEndTimestamp,
@@ -119,6 +120,7 @@ ${url}
     data[url] = {
       name: guildScheduledEvent.name,
       messageId: message.id,
+      announcementMessageId: data[url].announcementMessageId || null,
       description: guildScheduledEvent.description,
       start: startTime,
       end: endTime,
@@ -136,11 +138,14 @@ ${url}
 async function deleteEvent(guildScheduledEvent) {
   const url = guildScheduledEvent.url;
   const guild = client.guilds.cache.get(guildId);
-  const channel = guild.channels.cache.get(eventsChannel);
+  const eChannel = guild.channels.cache.get(eventsChannel);
+  const aChannel = guild.channels.cache.get(announcementsChannel);
 
   readFile("configs", "events").then(async (data) => {
-    const message = await channel.messages.fetch(data[url].messageId);
-    message.delete();
+    const messageEventsChannel = await eChannel.messages.fetch(data[url].messageId);
+    const messageAnnouncementsChannel = await aChannel.messages.fetch(data[url].announcementMessageId);
+    messageEventsChannel.delete();
+    messageAnnouncementsChannel.delete();
     delete data[url];
     writeFile("configs", "events", data);
   });
