@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const express = require("express");
-const cron = require("node-cron"); 
+const cron = require("node-cron");
 const app = express();
 const {
   Client,
@@ -9,13 +9,7 @@ const {
   GatewayIntentBits,
   InteractionType,
 } = require("discord.js");
-const {
-  token,
-  reactionChannel,
-  guildId,
-  eventsChannel,
-  announcementsChannel
-} = require("../configs/config.json");
+const { token, reactionChannel, guildId } = require("../configs/config.json");
 
 const {
   getActualRoleName,
@@ -31,7 +25,12 @@ const {
   giveRolesVraagStudent,
 } = require("./utils/vraag-de-student");
 const { readFile, writeFile } = require("./utils/jsonHelper");
-const { createEvent, deleteEvent, updateEvent, checkEvents } = require("./utils/evenementen");
+const {
+  createEvent,
+  deleteEvent,
+  updateEvent,
+  checkEvents,
+} = require("./utils/evenementen");
 
 const client = new Client({
   partials: ["MESSAGE", "CHANNEL", "REACTION"],
@@ -42,6 +41,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessageTyping,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildScheduledEvents,
+    GatewayIntentBits.GuildPresences,
   ],
 });
 
@@ -71,9 +71,9 @@ client.once("ready", async () => {
     writeFile("configs", "config", data);
   });
 
-  cron.schedule(`0 12 * * FRI`, async function() { 
+  cron.schedule(`0 12 * * FRI`, async function () {
     checkEvents();
-  }); 
+  });
 
   console.log("Ready!");
 });
@@ -154,7 +154,7 @@ client.on("guildScheduledEventDelete", async (guildScheduledEvent) => {
 client.login(token);
 
 app.get("/", (req, res) => {
-  res.send("Bot is running!");
+  res.send(`Bot is ${client.presence.status}!`);
 });
 
 app.listen(5000, () => {
