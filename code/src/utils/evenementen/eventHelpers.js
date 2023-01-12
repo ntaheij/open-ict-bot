@@ -1,3 +1,5 @@
+const { getActualRoleName } = require("../reaction-roles/filters");
+
 Date.prototype.setToNextWeekDay = function(x){
   var day = this.getDay() || 7;
   if( day !== x ) 
