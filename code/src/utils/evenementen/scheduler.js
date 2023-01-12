@@ -19,12 +19,14 @@ function checkEvents() {
     if (nextWeek.length === 0) return;
 
     let monday = new Date().setToNextWeekDay(1).toLocaleDateString("nl-NL", {
+      timezone: "Europe/Amsterdam",
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     });
     let friday = new Date().setToNextWeekDay(5).toLocaleDateString("nl-NL", {
+      timezone: "Europe/Amsterdam",
       weekday: "long",
       year: "numeric",
       month: "long",

@@ -85,10 +85,12 @@ async function updateEvent(guildScheduledEvent) {
       day: "numeric",
     });
     let start = new Date(startTime).toLocaleTimeString("nl-NL", {
+      timezone: "Europe/Amsterdam",
       hour: "numeric",
       minute: "numeric",
     });
     let end = new Date(endTime).toLocaleTimeString("nl-NL", {
+      timezone: "Europe/Amsterdam",
       hour: "numeric",
       minute: "numeric",
     });
