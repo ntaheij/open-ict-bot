@@ -16,6 +16,10 @@ function checkEvents() {
       return week === nextWeekDate;
     });
 
+    nextWeek = nextWeek.sort((a, b) => {
+      return new Date(a.start) - new Date(b.start);
+    });
+
     if (nextWeek.length === 0) return;
 
     let monday = new Date().setToNextWeekDay(1).toLocaleDateString("nl-NL", {
