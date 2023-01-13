@@ -1,18 +1,25 @@
 const { getActualRoleName } = require("../reaction-roles/filters");
 
-Date.prototype.setToNextWeekDay = function(x){
-  var day = this.getDay() || 7;
-  if( day !== x ) 
-    this.setHours(168 + (-24 * (x - 1))); 
-  return this;
-}
+Date.prototype.setToNextWeekDay = function (x) {
+  var now = this;
+  var result = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + ((7 + dayOfWeek - now.getDay()) % 7)
+  );
 
-Date.prototype.getWeekNumber = function(){
-var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
-var dayNum = d.getUTCDay() || 7;
-d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+  if (result < now) result.setDate(result.getDate() + 7);
+  return result;
+};
+
+Date.prototype.getWeekNumber = function () {
+  var d = new Date(
+    Date.UTC(this.getFullYear(), this.getMonth(), this.getDate())
+  );
+  var dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
 };
 
 function getRolesByNames(guildId, tags) {
@@ -33,5 +40,5 @@ function getRolesByNames(guildId, tags) {
 
 module.exports = {
   getRolesByNames,
-  Date
+  Date,
 };
