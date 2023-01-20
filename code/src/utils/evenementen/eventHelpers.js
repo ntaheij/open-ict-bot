@@ -1,6 +1,6 @@
 const { getActualRoleName } = require("../reaction-roles/filters");
 
-Date.prototype.setToNextWeekDay = function (x) {
+Date.prototype.setToNextWeekDay = function (dayOfWeek) {
   var now = this;
   var result = new Date(
     now.getFullYear(),
