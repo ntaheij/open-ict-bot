@@ -21,24 +21,24 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
-    const groupName = interaction.options.getString("naam");
+    let groupName = interaction.options.getString("naam");
     const guild = interaction.guild;
-    const position =
-      (await guild.roles.cache.find((role) => role.name == `Open Inno`)
-        .position);
+    const position = await guild.roles.cache.find(
+      (role) => role.name == `Open Inno`
+    ).position;
     const role = await guild.roles.create({
-        name: groupName,
-        color: "#99aab5",
-        mentionable: true,
-        position: position,
-        permissions: [
-          PermissionsBitField.Flags.SendMessages,
-          PermissionsBitField.Flags.SendMessagesInThreads,
-          PermissionsBitField.Flags.ViewChannel,
-          PermissionsBitField.Flags.ReadMessageHistory,
-          PermissionsBitField.Flags.CreatePrivateThreads,
-          PermissionsBitField.Flags.ChangeNickname,
-        ],
+      name: groupName,
+      color: "#99aab5",
+      mentionable: true,
+      position: position,
+      permissions: [
+        PermissionsBitField.Flags.SendMessages,
+        PermissionsBitField.Flags.SendMessagesInThreads,
+        PermissionsBitField.Flags.ViewChannel,
+        PermissionsBitField.Flags.ReadMessageHistory,
+        PermissionsBitField.Flags.CreatePrivateThreads,
+        PermissionsBitField.Flags.ChangeNickname,
+      ],
       reason: `Projectgroep ${groupName}`,
     });
     const yearRole = await guild.roles.cache.find(
@@ -79,6 +79,8 @@ module.exports = {
       reason: `Projectgroep ${groupName}`,
       parent: category.id,
     });
+    groupName = groupName.replace(/[^\w\s]/gi, "");
+    groupName = groupName.replace(/\s/g, "-");
     const voiceChannel = await guild.channels.create({
       name: groupName.toLowerCase(),
       type: ChannelType.GuildVoice,
