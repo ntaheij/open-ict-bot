@@ -96,6 +96,7 @@ module.exports = {
             PermissionsBitField.Flags.ReadMessageHistory,
             PermissionsBitField.Flags.CreatePrivateThreads,
             PermissionsBitField.Flags.ManageChannels,
+            PermissionsBitField.Flags.Connect,
           ],
         },
         {
