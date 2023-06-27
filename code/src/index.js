@@ -37,6 +37,8 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildInvites,
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.GuildMessageTyping,
     GatewayIntentBits.MessageContent,
@@ -150,6 +152,16 @@ client.on("guildScheduledEventUpdate", async (old, guildScheduledEvent) => {
 client.on("guildScheduledEventDelete", async (guildScheduledEvent) => {
   deleteEvent(guildScheduledEvent);
 });
+
+client.on("guildMemberAdd", (member) => {
+  console.log(member);
+  if(new Date().getTime() - new Date("2023-08-31").getTime() > 0) {
+    return;
+  }
+  let defaultRole = member.guild.roles.cache.find(role => role.name === "2324");
+
+  member.roles.add(defaultRole);
+})
 
 client.login(token);
 
