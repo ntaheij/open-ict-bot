@@ -158,7 +158,7 @@ client.on("guildMemberAdd", (member) => {
   if(new Date().getTime() - new Date("2023-08-31").getTime() > 0) {
     return;
   }
-  let defaultRole = member.guild.roles.cache.find(role => role.name === "2324");
+  let defaultRole = member.guild.roles.cache.find(role => role.name === "Jaar 1");
 
   member.roles.add(defaultRole);
 })
