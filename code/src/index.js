@@ -47,6 +47,8 @@ const client = new Client({
   ],
 });
 
+require("./utils/logger")(client);
+
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, "commands");
 const commandFiles = fs
