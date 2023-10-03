@@ -9,7 +9,14 @@ module.exports = {
 		const channel = interaction.options.getChannel('channel') || interaction.channel;
 		// if(!channel.isText()) return interaction.reply({ content: '💢 This command only works in text channels!', ephemeral: true });
 		if (!interaction.member.permissions.has('MANAGE_CHANNELS')) return interaction.reply({ content: '❌ You do not have the required permissions to use this command!', ephemeral: true });
-		await channel.permissionOverwrites.edit(interaction.guild.roles.everyone, { SendMessages: false });
+		await channel.permissionOverwrites.edit(interaction.guild.roles.everyone, {
+			SendMessages: false,
+			SendMessagesInThreads: false,
+			CreatePublicThreads: false,
+			CreatePrivateThreads: false,
+			ManageThreads: false,
+			AddReactions: false,
+		});
 		await interaction.reply({ content: `🔒 Locked ${channel}!`, ephemeral: true });
 	},
 };
