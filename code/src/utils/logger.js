@@ -279,7 +279,8 @@ ${newMessage.content.replace(/`/g, "'")}
         c,
         role.guild,
         "GREEN",
-        "ROLE CREATED"`ROLE: ${role}\nROLENAME: ${role.name}\nROLEID: ${role.id}\nHEXCOLOR: ${role.hexColor}\nPOSITION: ${role.position}`
+        "ROLE CREATED",
+        `ROLE: ${role}\nROLENAME: ${role.name}\nROLEID: ${role.id}\nHEXCOLOR: ${role.hexColor}\nPOSITION: ${role.position}`
       );
     });
 
@@ -288,7 +289,8 @@ ${newMessage.content.replace(/`/g, "'")}
         c,
         role.guild,
         "RED",
-        "ROLE DELETED"`ROLE: ${role}\nROLENAME: ${role.name}\nROLEID: ${role.id}\nHEXCOLOR: ${role.hexColor}\nPOSITION: ${role.position}`
+        "ROLE DELETED",
+        `ROLE: ${role}\nROLENAME: ${role.name}\nROLEID: ${role.id}\nHEXCOLOR: ${role.hexColor}\nPOSITION: ${role.position}`
       );
     });
 
