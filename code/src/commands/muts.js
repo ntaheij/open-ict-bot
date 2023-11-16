@@ -47,7 +47,7 @@ module.exports = {
       interaction.options.getInteger("offset-x") || (1024 - 650) / 2;
     const offsetY = interaction.options.getInteger("offset-y") || 0;
     const scale = interaction.options.getNumber("scale") || 1;
-    if (new Date("2022-12-26").setHours(23, 59, 59) <= Date.now())
+    if (new Date("2023-12-26").setHours(23, 59, 59) <= Date.now())
       return interaction.reply({
         content: "Kerst is al voorbij, slimpie.",
         ephemeral: true,
