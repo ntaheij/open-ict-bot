@@ -11,9 +11,11 @@ function checkEvents() {
   readFile("configs", "events").then(async (data) => {
     let events = Object.values(data);
     let nextWeek = events.filter((event) => {
+      let year = new Date(event.start).getYear();
+      let currentYear = new Date().getYear();
       let week = new Date(event.start).getWeekNumber();
       let nextWeekDate = new Date().getWeekNumber() + 1;
-      return week === nextWeekDate;
+      return (week === nextWeekDate) && (year === currentYear);
     });
 
     nextWeek = nextWeek.sort((a, b) => {
