@@ -21,6 +21,7 @@ module.exports = {
         .setRequired(true)
     ),
   async execute(interaction) {
+    await interaction.deferReply({ ephemeral: true });
     let groupName = interaction.options.getString("naam");
     const guild = interaction.guild;
     const position = await guild.roles.cache.find(
@@ -118,7 +119,7 @@ module.exports = {
         },
       ],
     });
-    await interaction.reply({
+    interaction.editReply({
       content: `Projectgroep ${groupName} is aangemaakt.`,
       ephemeral: true,
     });
